@@ -42,7 +42,7 @@ app.post(
     const language = getValidLanguage(req.body.language);
 
     if (!videoFile) {
-      return res.status(400).json({ error: "Arquivo de vídeo não enviado" });
+      return res.status(400).json({ message: "Arquivo de vídeo não enviado" });
     }
 
     const videoPath = videoFile.path;
@@ -69,7 +69,7 @@ app.post(
       res.status(200).json(transcriptionResponse);
     } catch (e) {
       console.error(e);
-      res.status(500).json({ error: "Falha ao processar legenda" });
+      res.status(500).json({ message: "Falha ao tentar transcrever áudio" });
     } finally {
       await removeFileIfExists(audioPath);
       await removeFileIfExists(videoPath);
