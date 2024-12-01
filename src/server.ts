@@ -66,7 +66,33 @@ app.post(
         timestamp_granularities: ["segment"],
         response_format: "verbose_json",
       });
-      res.status(200).json(transcriptionResponse);
+
+      const analysisResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Você é um assistente especializado em análise de textos. Forneça resumos, insights e análises detalhadas do conteúdo.",
+          },
+          {
+            role: "user",
+            content: `
+              Analise o seguinte texto extraído de um vídeo e forneça:
+              1. Um resumo breve do conteúdo.
+              2. O tom do texto (ex: formal, casual, educativo, etc.).
+              3. O tipo de texto (ex: notícia, artigo científico, poema, canção, etc.).
+              4. Quaisquer emoções predominantes detectadas no texto.
+              5. Pontos principais ou tópicos abordados.
+  
+              Texto: "${transcriptionResponse.text}"
+            `,
+          },
+        ],
+      });
+      const analysis = analysisResponse.choices[0].message.content;
+
+      res.status(200).json({ ...transcriptionResponse, analysis });
     } catch (e) {
       console.error(e);
       res.status(500).json({ message: "Falha ao tentar transcrever áudio" });
